@@ -1,0 +1,6 @@
+# - Local files.
+.terraform/
+*.tfstate
+*.tfstate.*
+.DS_Store
+/AGENTS.md

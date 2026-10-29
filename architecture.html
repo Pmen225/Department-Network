@@ -97,8 +97,8 @@ a { color: #2e5aa8; }
 <text class="name" x="808" y="676" style="text-anchor: start">Azure Files</text>
 <text class="note" x="808" y="700">Storage accounts outside the VNet</text>
 <text class="note" x="808" y="724">Public storage addresses</text>
-<text class="note" x="808" y="748">Permissions not configured</text>
-<text class="note" x="40" y="824">One shared subscription · No private endpoints · File access and printing not tested</text>
+<text class="note" x="808" y="748">To do: share permissions</text>
+<text class="note" x="40" y="824">One shared subscription · Public storage endpoints · To do: file access and printing tests</text>
 </svg>
 </div>
 <div class="explanations">
@@ -120,13 +120,13 @@ a { color: #2e5aa8; }
 <li><strong>System:</strong> Windows Server 2022.</li>
 <li><strong>Size:</strong> Standard_D2s_v4. Standard LRS system disk.</li>
 <li><strong>Addresses:</strong> dynamic private IPs. No VM public IPs.</li>
-<li><strong>Remote access:</strong> no VPN or Bastion configured.</li>
+<li><strong>Remote access:</strong> listed under To do.</li>
 </ul>
 </details>
 <details>
 <summary><strong>Password protection</strong></summary>
 <ul>
-<li><strong>Input:</strong> vm_admin_password. Required in the root and Networking module.</li>
+<li><strong>Input:</strong> vm_admin_password. Supplied at deployment; Terraform does not generate it.</li>
 <li><strong>sensitive = true:</strong> hides the password in normal Terraform output.</li>
 <li><strong>State + saved plans:</strong> still contain the password. Keep them private.</li>
 <li><strong>GitHub:</strong> state, saved plans and local variable files excluded.</li>
@@ -140,22 +140,23 @@ a { color: #2e5aa8; }
 <li><strong>Hot tier:</strong> frequent access. <strong>Quota:</strong> 500 GiB per share.</li>
 <li><strong>Cost tracking:</strong> used department tags.</li>
 <li><strong>Access:</strong> public storage addresses. No private endpoints.</li>
-<li><strong>Permissions:</strong> Entra ID authentication and share permissions not configured.</li>
+<li><strong>Permissions:</strong> Entra ID authentication and share permissions listed under To do.</li>
 </ul>
 </details>
 <details>
-<summary><strong>Checks and gaps</strong></summary>
+<summary><strong>To do</strong></summary>
 <ul>
-<li><strong>29 October 2026:</strong> Terraform validation and live plan passed.</li>
-<li><strong>Plan:</strong> 20 add · 0 change · 1 destroy.</li>
-<li><strong>Removal:</strong> old printer-subnet NSG attachment.</li>
-<li><strong>Not applied:</strong> file access, printing and connectivity untested.</li>
-<li><strong>Not configured:</strong> print service, file mounts and remote access.</li>
-<li><strong>DNS:</strong> zone still in Terraform. Removal planned; omitted from the diagram.</li>
-<li><strong>Known issue:</strong> resource group outputs all return the first group.</li>
+<li><label><input type="checkbox" disabled> Set up remote access to the VMs and configure sign-in.</label></li>
+<li><label><input type="checkbox" disabled> Configure Entra ID authentication, file-share permissions and mounts.</label></li>
+<li><label><input type="checkbox" disabled> Restrict storage network access.</label></li>
+<li><label><input type="checkbox" disabled> Set up printer devices and a print service.</label></li>
+<li><label><input type="checkbox" disabled> Test VM connections, file access and printing.</label></li>
+<li><label><input type="checkbox" disabled> Remove the unused private DNS zone from Terraform.</label></li>
+<li><label><input type="checkbox" disabled> Store the VM administrator password in Key Vault.</label></li>
+<li><label><input type="checkbox" disabled> Correct resource-group outputs so each returns its own group.</label></li>
 </ul>
 </details>
-<p><a href="README.md">Project overview</a> · <a href="DESIGN.md">Decisions and limitations</a></p>
+<p><a href="README.md">Project overview</a> · <a href="DESIGN.md">Design decisions</a></p>
 </div>
 </main>
 </body>

@@ -16,7 +16,7 @@ Shared Azure networking, three Windows VMs and department file shares.
 - **VM subnet:** `10.0.1.0/24`. NSG + NAT gateway attached.
 - **Internet access:** NAT gateway + static public IP.
 - **Printer subnet:** `10.0.2.0/28`. No NSG or NAT. Automatic outbound access disabled.
-- **Resource groups:** Five defined. See the output issue below.
+- **Resource groups:** Five defined. Output correction listed under To do.
 
 </details>
 
@@ -50,23 +50,24 @@ Shared Azure networking, three Windows VMs and department file shares.
 <summary><strong>Password protection</strong></summary>
 
 - **Source:** `vm_admin_password` supplied at deployment. Terraform does not generate it.
-- **Key Vault:** Not configured.
 - **Output:** `sensitive = true` hides the password in normal output.
 - **State + saved plans:** Contain the password. These files are excluded from GitHub.
 
 </details>
 
 <details>
-<summary><strong>Not configured / known issues</strong></summary>
+<summary><strong>To do</strong></summary>
 
-- **VM access:** No VPN or Bastion.
-- **Files:** No mounts, Entra ID authentication or share permissions.
-- **Storage:** Public endpoints. No private endpoints or network restrictions.
-- **Printing:** No printer devices or print service. The subnet only reserves addresses.
-- **Connectivity:** File access, printing and network connections untested.
-- **DNS zone:** Still in Terraform. Removal planned; omitted from the diagram.
-- **Outputs:** `rg1`, `rg2` and `rg3` all return `rg1`.
-- **Effect:** Network, VMs and Estates storage use `networking_Rg`.
+- [ ] Set up remote access to the VMs and configure sign-in.
+- [ ] Configure Entra ID authentication, file-share permissions and mounts.
+- [ ] Restrict storage network access. Storage currently uses public endpoints.
+- [ ] Set up printer devices and a print service. The subnet currently only reserves addresses.
+- [ ] Test VM connections, file access and printing.
+- [ ] Remove the unused private DNS zone from Terraform.
+- [ ] Store the VM administrator password in Key Vault.
+- [ ] Correct resource-group outputs: `rg1`, `rg2` and `rg3` currently all return `rg1`.
+
+Network, VMs and Estates storage currently use `networking_Rg`.
 
 </details>
 

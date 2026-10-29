@@ -1,6 +1,6 @@
 # Design decisions
 
-Choices, reasons and gaps in the Department Network configuration.
+Network, storage and VM choices for Estates, Finance and Operations.
 
 ## Subscription
 
@@ -22,7 +22,7 @@ Choices, reasons and gaps in the Department Network configuration.
 - **Rules:** Defaults only. Internal VNet traffic allowed; no custom restrictions.
 - **Outbound path:** NAT gateway + static public IP on the VM subnet.
 - **Printer subnet:** No NSG or NAT. Automatic outbound access disabled.
-- **DNS zone:** Still defined. Removal planned.
+- **DNS zone:** Removal listed under To do.
 
 [Azure NSG rules](https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview)
 
@@ -38,7 +38,7 @@ Choices, reasons and gaps in the Department Network configuration.
 <summary><strong>Password protection</strong></summary>
 
 - **Administrator:** `vmadmin` on all three VMs.
-- **Input:** `vm_admin_password`. Required in the root and Networking module.
+- **Input:** `vm_admin_password`. Supplied at deployment; Terraform does not generate it.
 - **sensitive = true:** Hides the password in normal Terraform output.
 - **Limit:** Does not encrypt it or remove it from state and saved plans.
 - **GitHub:** State, saved plans and local variable files excluded.
@@ -62,7 +62,7 @@ Choices, reasons and gaps in the Department Network configuration.
 - **Connection:** SMB, TCP 445.
 - **Storage:** Public endpoints enabled. No private endpoints or storage network rules.
 - **Resource groups:** Organise resources; do not provide connections or permissions.
-- **Entra ID + RBAC:** Intended. Authentication and role assignments not configured.
+- **Entra ID + RBAC:** Authentication and role assignments listed under To do.
 - **Printers:** Clients connect separately. Storage accounts do not send print jobs.
 - **Private access option:** Requires private endpoints and suitable DNS. Not configured.
 
@@ -91,11 +91,6 @@ Choices, reasons and gaps in the Department Network configuration.
 
 </details>
 
-## Gaps
+## To do
 
-- **Remote access:** No VPN or Bastion.
-- **VM setup:** No domain join, Entra sign-in, file mounts or printer software.
-- **Storage access:** Entra ID authentication and share permissions not configured.
-- **Printing:** No printer devices or print service defined.
-- **Testing:** File access, printing and network connectivity untested.
-- **Group outputs:** All return `rg1`; network, VMs and Estates storage use `networking_Rg`.
+See the [To do list](README.md) for the remaining setup and tests.

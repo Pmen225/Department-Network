@@ -1,0 +1,108 @@
+<!doctype html>
+<!-- This file shows the planned network and the reason for each main choice. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure network design</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #f5f5f5; color: #2d3142; font-family: Geist, sans-serif; }
+main { max-width: 1040px; margin: auto; padding: 36px 24px; }
+h1 { font: 40px 'Instrument Serif', serif; margin: 8px 0; }
+p { line-height: 1.5; }
+.diagram-container { width: 100%; overflow-x: auto; border: 1px solid #bfc0c0; background: white; }
+svg { display: block; width: 100%; min-width: 960px; }
+.name { font: 600 14px Geist, sans-serif; fill: #2d3142; text-anchor: middle; }
+.detail { font: 11px Geist, sans-serif; fill: #4f5d75; text-anchor: middle; }
+.note { font: 11px Geist, sans-serif; fill: #4f5d75; }
+.box { fill: #f5f5f5; stroke: #4f5d75; stroke-width: 1.5; }
+.planned { stroke-dasharray: 5 4; }
+.wire { fill: none; stroke: #4f5d75; stroke-width: 1.5; }
+.explanations { max-width: 860px; }
+.explanations p { margin: 8px 0; }
+a { color: #2e5aa8; }
+@media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Azure network design</h1>
+<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources; dashed lines and boxes show intended printer access.</p>
+<div class="diagram-container">
+<svg viewBox="0 0 960 600" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="network-title">Azure network and file storage design</title>
+<desc id="network-desc">A virtual network contains a VM subnet and a printer subnet. A security group is attached to the printer subnet. A NAT gateway is associated with the VM subnet and a public IP. The Estates storage account contains a managed file share. Virtual machines and printers are not deployed by this configuration.</desc>
+<!-- Lines show associations and containment, not verified traffic. -->
+<path class="wire" d="M 392 144 V 184 Q 392 192 384 192 H 358 Q 350 192 350 200 V 240 M 472 144 V 184 Q 472 192 480 192 H 542 Q 550 192 550 200 V 240"/>
+<path class="wire" d="M 755 144 V 188 Q 755 196 747 196 H 618 Q 610 196 610 204 V 240"/>
+<path class="wire" d="M 350 312 V 328 Q 350 336 358 336 H 717 Q 725 336 725 328 V 312"/>
+<path class="wire" d="M 755 312 V 400"/>
+<path class="wire" d="M 120 312 V 368"/>
+<!-- Network and its two subnets. -->
+<rect class="box" x="352" y="72" width="160" height="72" rx="8"/>
+<text class="name" x="432" y="101">Virtual network</text><text class="detail" x="432" y="122">10.0.0.0/16</text>
+<rect class="box" x="270" y="240" width="160" height="72" rx="8"/>
+<text class="name" x="350" y="268">Subnet 1 · VMs</text><text class="detail" x="350" y="289">10.0.1.0/24</text>
+<rect class="box" x="470" y="240" width="160" height="72" rx="8"/>
+<text class="name" x="550" y="268">Subnet 2 · printers</text><text class="detail" x="550" y="289">10.0.2.0/28</text>
+<!-- The security group and gateway are associated with subnets. -->
+<rect class="box" x="675" y="72" width="160" height="72" rx="8"/>
+<text class="name" x="755" y="100">Security group</text><text class="detail" x="755" y="121">Printer subnet rules</text>
+<rect x="675" y="240" width="160" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
+<text class="name" x="755" y="268">NAT gateway</text><text class="detail" x="755" y="289">Outbound for VM subnet</text>
+<rect class="box" x="675" y="400" width="160" height="72" rx="8"/>
+<text class="name" x="755" y="428">Public IP address</text><text class="detail" x="755" y="449">Used by NAT gateway</text>
+<!-- Storage is a separate managed service, not inside the VNet. -->
+<rect class="box" x="40" y="240" width="160" height="72" rx="8"/>
+<text class="name" x="120" y="268">Estates storage</text><text class="detail" x="120" y="289">Standard · GRS</text>
+<rect class="box" x="40" y="368" width="160" height="72" rx="8"/>
+<text class="name" x="120" y="396">Estates file share</text><text class="detail" x="120" y="417">Hot · 500 GiB quota</text>
+<text class="note" x="40" y="568">Terraform configuration · Virtual machines and printers are not included</text>
+</svg>
+</div>
+<h2>Departments and shared printing</h2>
+<p>Each department has its own storage account and a 500 GiB Hot file share. Department tags identify storage costs within the shared subscription. Printer access is part of the intended design.</p>
+<div class="diagram-container">
+<svg viewBox="0 0 960 600" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="department-title">Department storage in one subscription and shared printing</title>
+<desc id="department-desc">Finance, Estates and Operations each have a storage account and file share configured in one shared subscription. Each storage account is tagged with its department. All three require access to shared printers. The access permissions are not yet configured.</desc>
+<!-- Each department's dashed line shows intended printer access. -->
+<path class="wire planned" d="M 160 260 V 336 Q 160 344 168 344 H 352 Q 360 344 360 352 V 420"/>
+<path class="wire planned" d="M 480 260 V 420"/>
+<path class="wire planned" d="M 800 260 V 336 Q 800 344 792 344 H 608 Q 600 344 600 352 V 420"/>
+<rect class="box" x="40" y="80" width="240" height="180" rx="8"/>
+<text class="name" x="160" y="112">Finance</text>
+<text class="detail" x="160" y="136">Account tag: department = Finance</text>
+<rect class="box" x="64" y="164" width="192" height="64" rx="8"/>
+<text class="name" x="160" y="192">finance</text><text class="detail" x="160" y="212">Hot · 500 GiB</text>
+<rect class="box" x="360" y="80" width="240" height="180" rx="8"/>
+<text class="name" x="480" y="112">Estates</text>
+<text class="detail" x="480" y="136">Account tag: department = Estates</text>
+<rect class="box" x="384" y="164" width="192" height="64" rx="8"/>
+<text class="name" x="480" y="192">estates-fileshare</text><text class="detail" x="480" y="212">Hot · 500 GiB</text>
+<rect class="box" x="680" y="80" width="240" height="180" rx="8"/>
+<text class="name" x="800" y="112">Operations</text>
+<text class="detail" x="800" y="136">Account tag: department = Operations</text>
+<rect class="box" x="704" y="164" width="192" height="64" rx="8"/>
+<text class="name" x="800" y="192">operations</text><text class="detail" x="800" y="212">Hot · 500 GiB</text>
+<rect class="box planned" x="296" y="420" width="368" height="92" rx="8"/>
+<text class="name" x="480" y="452">Shared printers</text>
+<text class="detail" x="480" y="478">Printer subnet reserved · print service not configured</text>
+<text class="note" x="40" y="568">One shared subscription · Dashed paths show intended printer access</text>
+</svg>
+</div>
+<div class="explanations">
+<h2>Design decisions</h2>
+<p><strong>Shared subscription:</strong> keeps the network and department storage together. Separate storage accounts and department tags support cost tracking without extra subscriptions.</p>
+<p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The printer subnet has a security group with default rules. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
+<p><strong>Managed storage:</strong> Azure Files removes the need for a dedicated file-server VM. Each share uses the Hot tier for frequent access, a 500 GiB quota and Standard storage with geo-redundant replication.</p>
+<h2>Current status</h2>
+<p>Terraform validation and a live plan passed on 29 October 2026: 13 resources to add, none to change or destroy. These changes have not been applied.</p>
+<p>Microsoft Entra ID authentication, file-share permissions and a print service are not configured. The printer subnet alone does not provide printing.</p>
+<p>The private DNS zone remains in Terraform and is omitted from these diagrams because its removal is planned. The resource group outputs all reference the first resource group. See <a href="DESIGN.md">design decisions and limitations</a>.</p>
+</div>
+</main>
+</body>
+</html>

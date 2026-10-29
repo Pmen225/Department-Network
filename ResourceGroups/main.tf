@@ -1,4 +1,4 @@
-# - Resource groups.
+# - Resource groups in the shared subscription set by the root module.
 terraform {
   required_providers {
     azurerm = {
@@ -6,10 +6,6 @@ terraform {
       version = "=5.0.0"
     }
   }
-}
-
-provider "azurerm" {
-  features {}
 }
 
 
@@ -26,7 +22,7 @@ resource "azurerm_resource_group" "rg2" {
 }
 
 
-  resource "azurerm_resource_group" "rg3" {
+resource "azurerm_resource_group" "rg3" {
   name     = var.resource_group_name3
   location = var.location
 

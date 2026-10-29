@@ -1,4 +1,4 @@
-# - Network resources.
+# - Shared network and department storage. Used tags to identify each department's storage costs.
 terraform {
   required_providers {
     azurerm = {
@@ -7,11 +7,6 @@ terraform {
     }
   }
 }
-
-provider "azurerm" {
-  features {}
-}
-
 
 
 
@@ -76,13 +71,93 @@ resource "azurerm_public_ip" "nat_public_ip" {
 }
 
 
-
 resource "azurerm_nat_gateway_public_ip_association" "nat_public_ip" {
   nat_gateway_id       = azurerm_nat_gateway.NATGateway.id
   public_ip_address_id = azurerm_public_ip.nat_public_ip.id
 }
 
+
 resource "azurerm_subnet_nat_gateway_association" "subnet_1" {
   subnet_id      = azurerm_subnet.subnet_1.id
   nat_gateway_id = azurerm_nat_gateway.NATGateway.id
+}
+
+
+resource "azurerm_private_dns_zone" "private_dns_zone" {
+  name                = var.private_dns_zone_name
+  resource_group_name = var.resource_group_name
+}
+
+
+### - Storage resources
+
+resource "azurerm_storage_account" "storage_account" {
+  name                     = var.storage_account_name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = {
+    department = "Estates"
+  }
+}
+
+
+resource "azurerm_storage_share" "estates_fileshare" {
+  name               = var.estates_fileshare_name
+  storage_account_id = azurerm_storage_account.storage_account.id
+  quota              = 500
+  access_tier        = "Hot"
+}
+
+resource "azurerm_resource_group" "finance" {
+  name     = "finance_storage_rg"
+  location = "UK South"
+}
+
+resource "azurerm_storage_account" "finance" {
+  name                     = var.finance_storage_account_name
+  resource_group_name      = azurerm_resource_group.finance.name
+  location                 = azurerm_resource_group.finance.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = {
+    department = "Finance"
+  }
+}
+
+resource "azurerm_storage_share" "finance" {
+  name               = "finance"
+  storage_account_id = azurerm_storage_account.finance.id
+  quota              = 500
+  access_tier        = "Hot"
+}
+
+resource "azurerm_resource_group" "operations" {
+  name     = "operations_storage_rg"
+  location = "UK South"
+}
+
+resource "azurerm_storage_account" "operations" {
+  name                     = var.operations_storage_account_name
+  resource_group_name      = azurerm_resource_group.operations.name
+  location                 = azurerm_resource_group.operations.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = {
+    department = "Operations"
+  }
+}
+
+resource "azurerm_storage_share" "operations" {
+  name               = "operations"
+  storage_account_id = azurerm_storage_account.operations.id
+  quota              = 500
+  access_tier        = "Hot"
 }

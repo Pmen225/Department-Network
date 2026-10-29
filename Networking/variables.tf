@@ -58,3 +58,30 @@ variable "subnet_2_address_prefix" {
   description = "Address range for the printer subnet"
   type        = string
 }
+
+
+variable "private_dns_zone_name" {
+  description = "Name of the private DNS zone"
+  type        = string
+}
+
+
+variable "storage_account_name" {
+  description = "Name of the storage account"
+  type        = string
+}
+
+variable "estates_fileshare_name" {
+  description = "Name of the Estates file share"
+  type        = string
+}
+
+variable "finance_storage_account_name" {
+  description = "Name of the Finance storage account"
+  type        = string
+}
+
+variable "operations_storage_account_name" {
+  description = "Name of the Operations storage account"
+  type        = string
+}

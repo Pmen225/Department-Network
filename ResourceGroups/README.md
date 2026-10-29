@@ -1,6 +1,7 @@
 # Resource groups
 
 - Region: UK South.
+- Uses the shared subscription configured in the root module.
 - `networking_Rg`.
 - `virtual_machine_Rg`.
 - `Storage_Rg`.

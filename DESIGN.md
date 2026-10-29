@@ -1,0 +1,25 @@
+# Design decisions
+
+## Network
+
+- **One virtual network:** groups the network resources in `10.0.0.0/16`.
+- **Separate subnets:** `10.0.1.0/24` is intended for virtual machines; `10.0.2.0/28` is intended for printers. This separates their network addresses.
+- **Printer subnet security:** a network security group is attached. No custom rules are defined yet. Automatic outbound access is disabled.
+- **Outbound access:** a NAT gateway and static public IP are attached to the VM subnet to provide an outbound path. The printer subnet has no NAT gateway.
+- **Private DNS:** removal is planned. The private DNS zone is still present in the current Terraform configuration.
+
+## Files and access
+
+- **Departments:** one subscription holds the shared network and all three departments' storage accounts and file shares. Separate subscriptions are not required for this design. Printer access is not configured.
+- **Cost tracking:** each storage account has a `department` tag set to `Estates`, `Finance` or `Operations`. Separate accounts allow storage costs to be grouped by department without separate subscriptions.
+- **Azure Files:** a managed file share avoids the need for a dedicated file-server VM.
+- **Capacity and access tier:** each share has a 500 GiB quota and uses the Hot tier, chosen for frequent access.
+- **Replication:** each Standard storage account uses geo-redundant storage (GRS).
+- **Identity:** Microsoft Entra ID and role-based access are intended for all three shares. Identity-based authentication and role assignments are not yet configured.
+
+## Scope and limitations
+
+- The diagram concept includes users, VMs and a printer. They are not defined as resources in this Terraform configuration.
+- No printer service, private endpoint, or file-share access permissions are configured.
+- A live Terraform plan passed on 29 October 2026: 13 resources to add, none to change or destroy. These changes have not been applied; file access, printing and network connectivity have not been tested.
+- The resource group outputs currently all point to the first resource group; see the root README.

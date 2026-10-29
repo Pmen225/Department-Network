@@ -29,68 +29,66 @@ a { color: #2e5aa8; }
 <body>
 <main>
 <h1>Azure network design</h1>
-<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources; dashed lines and boxes show intended printer access.</p>
+<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources. Dashed boxes and arrows show clients, printers and access paths that are not deployed or tested.</p>
 <div class="diagram-container">
 <svg viewBox="0 0 960 600" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="network-title">Azure network and file storage design</title>
-<desc id="network-desc">A virtual network contains a VM subnet and a printer subnet. A security group is attached to the printer subnet. A NAT gateway is associated with the VM subnet and a public IP. The Estates storage account contains a managed file share. Virtual machines and printers are not deployed by this configuration.</desc>
-<!-- Lines show associations and containment, not verified traffic. -->
-<path class="wire" d="M 392 144 V 184 Q 392 192 384 192 H 358 Q 350 192 350 200 V 240 M 472 144 V 184 Q 472 192 480 192 H 542 Q 550 192 550 200 V 240"/>
-<path class="wire" d="M 755 144 V 188 Q 755 196 747 196 H 618 Q 610 196 610 204 V 240"/>
-<path class="wire" d="M 350 312 V 328 Q 350 336 358 336 H 717 Q 725 336 725 328 V 312"/>
-<path class="wire" d="M 755 312 V 400"/>
-<path class="wire" d="M 120 312 V 368"/>
-<!-- Network and its two subnets. -->
-<rect class="box" x="352" y="72" width="160" height="72" rx="8"/>
-<text class="name" x="432" y="101">Virtual network</text><text class="detail" x="432" y="122">10.0.0.0/16</text>
-<rect class="box" x="270" y="240" width="160" height="72" rx="8"/>
-<text class="name" x="350" y="268">Subnet 1 · VMs</text><text class="detail" x="350" y="289">10.0.1.0/24</text>
-<rect class="box" x="470" y="240" width="160" height="72" rx="8"/>
-<text class="name" x="550" y="268">Subnet 2 · printers</text><text class="detail" x="550" y="289">10.0.2.0/28</text>
-<!-- The security group and gateway are associated with subnets. -->
-<rect class="box" x="675" y="72" width="160" height="72" rx="8"/>
-<text class="name" x="755" y="100">Security group</text><text class="detail" x="755" y="121">Printer subnet rules</text>
-<rect x="675" y="240" width="160" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
-<text class="name" x="755" y="268">NAT gateway</text><text class="detail" x="755" y="289">Outbound for VM subnet</text>
-<rect class="box" x="675" y="400" width="160" height="72" rx="8"/>
-<text class="name" x="755" y="428">Public IP address</text><text class="detail" x="755" y="449">Used by NAT gateway</text>
-<!-- Storage is a separate managed service, not inside the VNet. -->
-<rect class="box" x="40" y="240" width="160" height="72" rx="8"/>
-<text class="name" x="120" y="268">Estates storage</text><text class="detail" x="120" y="289">Standard · GRS</text>
-<rect class="box" x="40" y="368" width="160" height="72" rx="8"/>
-<text class="name" x="120" y="396">Estates file share</text><text class="detail" x="120" y="417">Hot · 500 GiB quota</text>
-<text class="note" x="40" y="568">Terraform configuration · Virtual machines and printers are not included</text>
+<title id="network-title">Shared Azure network</title>
+<desc id="network-desc">The virtual network contains VM and printer subnets, with a security group on the printer subnet and a NAT gateway and public IP for VM outbound connections.</desc>
+<!-- Lines show resource associations, not tested traffic. -->
+<path class="wire" d="M 264 136 V 184 Q 264 192 256 192 H 188 Q 180 192 180 200 V 256"/>
+<path class="wire" d="M 336 136 V 184 Q 336 192 344 192 H 452 Q 460 192 460 200 V 256"/>
+<path class="wire" d="M 700 136 V 192 Q 700 200 692 200 H 528 Q 520 200 520 208 V 256"/>
+<path class="wire" d="M 180 328 V 368 Q 180 376 188 376 H 692 Q 700 376 700 368 V 328"/>
+<path class="wire" d="M 780 328 V 432"/>
+<rect class="box" x="200" y="64" width="200" height="72" rx="8"/>
+<text class="name" x="300" y="92">Virtual network</text><text class="detail" x="300" y="116">10.0.0.0/16</text>
+<rect class="box" x="600" y="64" width="200" height="72" rx="8"/>
+<text class="name" x="700" y="92">Security group</text><text class="detail" x="700" y="116">Printer subnet rules</text>
+<rect class="box" x="80" y="256" width="200" height="72" rx="8"/>
+<text class="name" x="180" y="284">Subnet 1 · VMs</text><text class="detail" x="180" y="308">10.0.1.0/24</text>
+<rect class="box" x="360" y="256" width="200" height="72" rx="8"/>
+<text class="name" x="460" y="284">Subnet 2 · printers</text><text class="detail" x="460" y="308">10.0.2.0/28</text>
+<rect x="640" y="256" width="200" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
+<text class="name" x="740" y="284">NAT gateway</text><text class="detail" x="740" y="308">Outbound for VM subnet</text>
+<rect class="box" x="640" y="432" width="200" height="72" rx="8"/>
+<text class="name" x="740" y="460">Public IP address</text><text class="detail" x="740" y="484">Used by NAT gateway</text>
+<text class="note" x="40" y="568">Shared network resources · No VMs or printers are deployed by this configuration</text>
 </svg>
 </div>
-<h2>Departments and shared printing</h2>
-<p>Each department has its own storage account and a 500 GiB Hot file share. Department tags identify storage costs within the shared subscription. Printer access is part of the intended design.</p>
+<h2>File and printer access</h2>
+<p>VM clients access each department's file share through its storage account address. They connect to printers separately. Dashed arrows show intended client access; storage accounts do not send print jobs.</p>
 <div class="diagram-container">
-<svg viewBox="0 0 960 600" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="department-title">Department storage in one subscription and shared printing</title>
-<desc id="department-desc">Finance, Estates and Operations each have a storage account and file share configured in one shared subscription. Each storage account is tagged with its department. All three require access to shared printers. The access permissions are not yet configured.</desc>
-<!-- Each department's dashed line shows intended printer access. -->
-<path class="wire planned" d="M 160 260 V 336 Q 160 344 168 344 H 352 Q 360 344 360 352 V 420"/>
-<path class="wire planned" d="M 480 260 V 420"/>
-<path class="wire planned" d="M 800 260 V 336 Q 800 344 792 344 H 608 Q 600 344 600 352 V 420"/>
-<rect class="box" x="40" y="80" width="240" height="180" rx="8"/>
-<text class="name" x="160" y="112">Finance</text>
-<text class="detail" x="160" y="136">Account tag: department = Finance</text>
-<rect class="box" x="64" y="164" width="192" height="64" rx="8"/>
-<text class="name" x="160" y="192">finance</text><text class="detail" x="160" y="212">Hot · 500 GiB</text>
-<rect class="box" x="360" y="80" width="240" height="180" rx="8"/>
-<text class="name" x="480" y="112">Estates</text>
-<text class="detail" x="480" y="136">Account tag: department = Estates</text>
-<rect class="box" x="384" y="164" width="192" height="64" rx="8"/>
-<text class="name" x="480" y="192">estates-fileshare</text><text class="detail" x="480" y="212">Hot · 500 GiB</text>
-<rect class="box" x="680" y="80" width="240" height="180" rx="8"/>
-<text class="name" x="800" y="112">Operations</text>
-<text class="detail" x="800" y="136">Account tag: department = Operations</text>
-<rect class="box" x="704" y="164" width="192" height="64" rx="8"/>
-<text class="name" x="800" y="192">operations</text><text class="detail" x="800" y="212">Hot · 500 GiB</text>
-<rect class="box planned" x="296" y="420" width="368" height="92" rx="8"/>
-<text class="name" x="480" y="452">Shared printers</text>
-<text class="detail" x="480" y="478">Printer subnet reserved · print service not configured</text>
-<text class="note" x="40" y="568">One shared subscription · Dashed paths show intended printer access</text>
+<svg viewBox="0 0 960 680" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="department-title">VM access to department files and shared printers</title>
+<desc id="department-desc">Planned VM clients access three department file shares through public storage endpoints and connect separately to shared printers, subject to network access and permissions.</desc>
+<defs><marker id="department-arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4f5d75"/></marker></defs>
+<!-- Access starts at clients, never at a storage account. -->
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 420 92 V 152 Q 420 160 412 160 H 168 Q 160 160 160 168 V 240"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 480 92 V 240"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 540 92 V 152 Q 540 160 548 160 H 792 Q 800 160 800 168 V 240"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 600 56 H 928 Q 936 56 936 64 V 472 Q 936 480 928 480 H 808 Q 800 480 800 488 V 520"/>
+<rect class="box planned" x="360" y="20" width="240" height="72" rx="8"/>
+<text class="name" x="480" y="48">VMs in shared VNet</text><text class="detail" x="480" y="72">Clients · not deployed</text>
+<text class="note" x="40" y="464">FILE ACCESS · PUBLIC STORAGE ENDPOINTS · SMB / TCP 445</text>
+<rect class="box" x="40" y="240" width="240" height="180" rx="8"/>
+<text class="name" x="160" y="272">Finance storage account</text>
+<text class="detail" x="160" y="296">department = Finance</text>
+<rect class="box" x="64" y="324" width="192" height="64" rx="8"/>
+<text class="name" x="160" y="352">finance</text><text class="detail" x="160" y="372">Hot · 500 GiB</text>
+<rect class="box" x="360" y="240" width="240" height="180" rx="8"/>
+<text class="name" x="480" y="272">Estates storage account</text>
+<text class="detail" x="480" y="296">department = Estates</text>
+<rect class="box" x="384" y="324" width="192" height="64" rx="8"/>
+<text class="name" x="480" y="352">estates-fileshare</text><text class="detail" x="480" y="372">Hot · 500 GiB</text>
+<rect class="box" x="680" y="240" width="240" height="180" rx="8"/>
+<text class="name" x="800" y="272">Operations storage account</text>
+<text class="detail" x="800" y="296">department = Operations</text>
+<rect class="box" x="704" y="324" width="192" height="64" rx="8"/>
+<text class="name" x="800" y="352">operations</text><text class="detail" x="800" y="372">Hot · 500 GiB</text>
+<rect class="box planned" x="680" y="520" width="240" height="72" rx="8"/>
+<text class="name" x="800" y="548">Shared printers</text>
+<text class="detail" x="800" y="572">Print service not configured</text>
+<text class="note" x="40" y="628">One shared subscription · No private endpoints · Authentication and permissions still required</text>
 </svg>
 </div>
 <div class="explanations">
@@ -98,6 +96,8 @@ a { color: #2e5aa8; }
 <p><strong>Shared subscription:</strong> keeps the network and department storage together. Separate storage accounts and department tags support cost tracking without extra subscriptions.</p>
 <p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The printer subnet has a security group with default rules. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
 <p><strong>Managed storage:</strong> Azure Files removes the need for a dedicated file-server VM. Each share uses the Hot tier for frequent access, a 500 GiB quota and Standard storage with geo-redundant replication.</p>
+<p><strong>File access:</strong> a client resolves the storage account name, connects over SMB on TCP port 445 and authenticates with permission to the share. The current configuration enables public storage endpoints and defines no private endpoints. A resource group organises resources; it does not connect them.</p>
+<p><strong>Private access option:</strong> a private endpoint would provide a private IP in the VNet for reaching the file service. It would also require DNS to resolve the storage name to that IP. This option is not configured.</p>
 <h2>Current status</h2>
 <p>Terraform validation and a live plan passed on 29 October 2026: 13 resources to add, none to change or destroy. These changes have not been applied.</p>
 <p>Microsoft Entra ID authentication, file-share permissions and a print service are not configured. The printer subnet alone does not provide printing.</p>

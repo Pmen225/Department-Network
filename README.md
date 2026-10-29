@@ -17,7 +17,7 @@ Terraform configuration for shared networking and department file storage in Azu
 
 ## Limitations
 
-- Microsoft Entra ID authentication and file-share permissions are not configured. File access and network connectivity have not been tested.
+- Storage uses public endpoints; no private endpoints are configured. Microsoft Entra ID authentication and file-share permissions are not configured. File access and network connectivity have not been tested.
 - Printer access requires a print service and permissions. The subnet only reserves network addresses.
 - The private DNS zone remains in Terraform; its removal is planned. It is omitted from the diagrams.
 - Resource group outputs `rg1`, `rg2` and `rg3` all return `rg1`. Networking and Estates storage therefore use `networking_Rg`.

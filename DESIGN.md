@@ -12,7 +12,10 @@
 
 - **Departments:** one subscription holds the shared network and all three departments' storage accounts and file shares. Separate subscriptions are not required for this design. Printer access is not configured.
 - **Cost tracking:** each storage account has a `department` tag set to `Estates`, `Finance` or `Operations`. Separate accounts allow storage costs to be grouped by department without separate subscriptions.
-- **Azure Files:** a managed file share avoids the need for a dedicated file-server VM.
+- **Azure Files:** managed file shares avoid the need for a dedicated file-server VM. Clients resolve the storage account address, connect using SMB on TCP 445, then authenticate with permission to the share.
+- **Storage network access:** public network access is enabled; no private endpoints or storage network rules are defined. Resource group membership does not provide connectivity or file permissions. Private endpoints with suitable DNS would provide a private access path, but are not configured.
+- **Printer access:** clients connect to printers separately. Storage accounts do not connect to printers.
+- [Azure Files networking requirements](https://learn.microsoft.com/en-us/azure/storage/files/storage-files-networking-overview).
 - **Capacity and access tier:** each share has a 500 GiB quota and uses the Hot tier, chosen for frequent access.
 - **Replication:** each Standard storage account uses geo-redundant storage (GRS).
 - **Identity:** Microsoft Entra ID and role-based access are intended for all three shares. Identity-based authentication and role assignments are not yet configured.

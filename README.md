@@ -49,21 +49,10 @@ Shared Azure networking, three Windows VMs and department file shares.
 <details>
 <summary><strong>Password protection</strong></summary>
 
-- **Input:** `vm_admin_password`. Required; marked `sensitive = true`.
-- **Normal output:** Password hidden.
-- **State + saved plans:** Still contain the password. Keep them private.
-- **GitHub:** State, saved plans and local variable files excluded.
-
-</details>
-
-<details>
-<summary><strong>Checks</strong></summary>
-
-- **Date:** 29 October 2026.
-- **Validation:** Passed.
-- **Live plan:** **20 add · 0 change · 1 destroy**.
-- **Removal:** Old printer-subnet NSG attachment.
-- **Deployment:** These changes have not been applied.
+- **Source:** `vm_admin_password` supplied at deployment. Terraform does not generate it.
+- **Key Vault:** Not configured.
+- **Output:** `sensitive = true` hides the password in normal output.
+- **State + saved plans:** Contain the password. These files are excluded from GitHub.
 
 </details>
 

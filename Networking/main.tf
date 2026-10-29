@@ -1,4 +1,4 @@
-# - Shared network and department storage. Used tags to identify each department's storage costs.
+# - Shared network, Windows VMs and department storage. Used tags to identify each department's storage costs.
 terraform {
   required_providers {
     azurerm = {
@@ -160,4 +160,109 @@ resource "azurerm_storage_share" "operations" {
   storage_account_id = azurerm_storage_account.operations.id
   quota              = 500
   access_tier        = "Hot"
+}
+
+
+# - Department Windows VMs in the shared VM subnet.
+
+resource "azurerm_network_interface" "estates" {
+  name                = "estates-nic"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet_1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "estates" {
+  name                  = "estates-vm"
+  resource_group_name   = var.resource_group_name
+  location              = var.location
+  size                  = "Standard_D2s_v4"
+  admin_username        = "vmadmin"
+  admin_password        = var.vm_admin_password
+  network_interface_ids = [azurerm_network_interface.estates.id]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_network_interface" "finance" {
+  name                = "finance-nic"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet_1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "finance" {
+  name                  = "finance-vm"
+  resource_group_name   = var.resource_group_name
+  location              = var.location
+  size                  = "Standard_D2s_v4"
+  admin_username        = "vmadmin"
+  admin_password        = var.vm_admin_password
+  network_interface_ids = [azurerm_network_interface.finance.id]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_network_interface" "operations" {
+  name                = "operations-nic"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet_1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "operations" {
+  name                  = "operations-vm"
+  resource_group_name   = var.resource_group_name
+  location              = var.location
+  size                  = "Standard_D2s_v4"
+  admin_username        = "vmadmin"
+  admin_password        = var.vm_admin_password
+  network_interface_ids = [azurerm_network_interface.operations.id]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
 }

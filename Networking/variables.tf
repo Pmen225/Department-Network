@@ -1,4 +1,4 @@
-# - Network inputs.
+# - Network, VM and storage inputs.
 variable "nsg_name" {
   description = "Name of the NSG"
   type        = string
@@ -84,4 +84,10 @@ variable "finance_storage_account_name" {
 variable "operations_storage_account_name" {
   description = "Name of the Operations storage account"
   type        = string
+}
+
+variable "vm_admin_password" {
+  description = "Administrator password for the three Windows VMs"
+  type        = string
+  sensitive   = true
 }

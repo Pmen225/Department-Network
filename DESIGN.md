@@ -3,10 +3,17 @@
 ## Network
 
 - **One virtual network:** groups the network resources in `10.0.0.0/16`.
-- **Separate subnets:** `10.0.1.0/24` is intended for virtual machines; `10.0.2.0/28` is intended for printers. This separates their network addresses.
+- **Separate subnets:** `10.0.1.0/24` holds the three virtual machines; `10.0.2.0/28` is intended for printers. This separates their network addresses.
 - **Printer subnet security:** a network security group is attached. No custom rules are defined yet. Automatic outbound access is disabled.
 - **Outbound access:** a NAT gateway and static public IP are attached to the VM subnet to provide an outbound path. The printer subnet has no NAT gateway.
 - **Private DNS:** removal is planned. The private DNS zone is still present in the current Terraform configuration.
+
+## Virtual machines
+
+- **One per department:** Estates, Finance and Operations each have a Windows Server 2022 VM in the shared VM subnet. Separate resource blocks keep the configuration straightforward.
+- **Size and disk:** each uses `Standard_D2s_v4` with a Standard LRS system disk. Azure listed this size without subscription restrictions in UK South when checked. The three VMs require six processor cores; the regional and VM-family quotas each had ten available. A plan does not reserve capacity.
+- **Private addresses:** each VM has its own network interface and a dynamic private IP. The existing NAT gateway provides the subnet's outbound path. No VM public IP, VPN or Bastion is configured.
+- **Administrator:** all three VMs use `vmadmin` and a required sensitive password input. Terraform state and saved plans contain the password and must remain private. No domain join, Microsoft Entra sign-in, file-share mounting or printer software is configured.
 
 ## Files and access
 
@@ -22,7 +29,7 @@
 
 ## Scope and limitations
 
-- The diagram concept includes users, VMs and a printer. They are not defined as resources in this Terraform configuration.
+- Three Windows VMs are defined in Terraform. Printer devices and a print service remain outside the configuration.
 - No printer service, private endpoint, or file-share access permissions are configured.
-- A live Terraform plan passed on 29 October 2026: 13 resources to add, none to change or destroy. These changes have not been applied; file access, printing and network connectivity have not been tested.
+- A live Terraform plan passed on 29 October 2026: 19 resources to add, none to change or destroy. These changes have not been applied; file access, printing and network connectivity have not been tested.
 - The resource group outputs currently all point to the first resource group; see the root README.

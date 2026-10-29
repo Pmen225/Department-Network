@@ -4,3 +4,8 @@
 *.tfstate.*
 .DS_Store
 /AGENTS.md
+
+# - Keep local credentials and saved plans out of GitHub.
+*.tfvars
+*.tfvars.json
+*.tfplan

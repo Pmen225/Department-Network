@@ -25,6 +25,7 @@ module "Resource_Groups" {
 
 module "Networking" {
   source                          = "./Networking"
+  vm_admin_password               = var.vm_admin_password
   nsg_name                        = "Network_NSG"
   vnet_name                       = "Vnet1"
   vnet_address_space              = "10.0.0.0/16"
@@ -51,4 +52,10 @@ variable "finance_storage_account_name" {
 
 variable "operations_storage_account_name" {
   type = string
+}
+
+variable "vm_admin_password" {
+  description = "Administrator password for the three Windows VMs"
+  type        = string
+  sensitive   = true
 }

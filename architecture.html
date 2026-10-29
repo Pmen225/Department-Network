@@ -29,17 +29,20 @@ a { color: #2e5aa8; }
 <body>
 <main>
 <h1>Azure network design</h1>
-<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources. Dashed boxes and arrows show clients, printers and access paths that are not deployed or tested.</p>
+<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources. Dashed boxes show the proposed printers. Dashed arrows show access paths that have not been configured or tested. These changes have not been applied.</p>
 <div class="diagram-container">
-<svg viewBox="0 0 960 600" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 960 660" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="network-title">Shared Azure network</title>
-<desc id="network-desc">The virtual network contains VM and printer subnets, with a security group on the printer subnet and a NAT gateway and public IP for VM outbound connections.</desc>
+<desc id="network-desc">Estates, Finance and Operations each have a Windows VM in the shared VM subnet, which uses a NAT gateway and public IP for outbound connections; the printer subnet has a security group.</desc>
 <!-- Lines show resource associations, not tested traffic. -->
 <path class="wire" d="M 264 136 V 184 Q 264 192 256 192 H 188 Q 180 192 180 200 V 256"/>
 <path class="wire" d="M 336 136 V 184 Q 336 192 344 192 H 452 Q 460 192 460 200 V 256"/>
 <path class="wire" d="M 700 136 V 192 Q 700 200 692 200 H 528 Q 520 200 520 208 V 256"/>
-<path class="wire" d="M 180 328 V 368 Q 180 376 188 376 H 692 Q 700 376 700 368 V 328"/>
+<path class="wire" d="M 280 292 H 304 Q 312 292 312 300 V 368 Q 312 376 320 376 H 692 Q 700 376 700 368 V 328"/>
 <path class="wire" d="M 780 328 V 432"/>
+<path class="wire" d="M 128 328 V 484"/>
+<path class="wire" d="M 180 328 V 448 Q 180 456 188 456 H 320 Q 328 456 328 464 V 484"/>
+<path class="wire" d="M 232 328 V 416 Q 232 424 240 424 H 520 Q 528 424 528 432 V 484"/>
 <rect class="box" x="200" y="64" width="200" height="72" rx="8"/>
 <text class="name" x="300" y="92">Virtual network</text><text class="detail" x="300" y="116">10.0.0.0/16</text>
 <rect class="box" x="600" y="64" width="200" height="72" rx="8"/>
@@ -52,7 +55,13 @@ a { color: #2e5aa8; }
 <text class="name" x="740" y="284">NAT gateway</text><text class="detail" x="740" y="308">Outbound for VM subnet</text>
 <rect class="box" x="640" y="432" width="200" height="72" rx="8"/>
 <text class="name" x="740" y="460">Public IP address</text><text class="detail" x="740" y="484">Used by NAT gateway</text>
-<text class="note" x="40" y="568">Shared network resources · No VMs or printers are deployed by this configuration</text>
+<rect class="box" x="40" y="484" width="176" height="72" rx="8"/>
+<text class="name" x="128" y="512">Estates VM</text><text class="detail" x="128" y="536">Windows Server 2022</text>
+<rect class="box" x="240" y="484" width="176" height="72" rx="8"/>
+<text class="name" x="328" y="512">Finance VM</text><text class="detail" x="328" y="536">Windows Server 2022</text>
+<rect class="box" x="440" y="484" width="176" height="72" rx="8"/>
+<text class="name" x="528" y="512">Operations VM</text><text class="detail" x="528" y="536">Windows Server 2022</text>
+<text class="note" x="40" y="624">Three Windows VMs · Private addresses only · Printer devices and print service not configured</text>
 </svg>
 </div>
 <h2>File and printer access</h2>
@@ -60,15 +69,15 @@ a { color: #2e5aa8; }
 <div class="diagram-container">
 <svg viewBox="0 0 960 680" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="department-title">VM access to department files and shared printers</title>
-<desc id="department-desc">Planned VM clients access three department file shares through public storage endpoints and connect separately to shared printers, subject to network access and permissions.</desc>
+<desc id="department-desc">Three Windows VMs are intended to access department file shares through public storage endpoints and connect separately to shared printers, subject to network access and permissions.</desc>
 <defs><marker id="department-arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4f5d75"/></marker></defs>
 <!-- Access starts at clients, never at a storage account. -->
 <path class="wire planned" marker-end="url(#department-arrow)" d="M 420 92 V 152 Q 420 160 412 160 H 168 Q 160 160 160 168 V 240"/>
 <path class="wire planned" marker-end="url(#department-arrow)" d="M 480 92 V 240"/>
 <path class="wire planned" marker-end="url(#department-arrow)" d="M 540 92 V 152 Q 540 160 548 160 H 792 Q 800 160 800 168 V 240"/>
 <path class="wire planned" marker-end="url(#department-arrow)" d="M 600 56 H 928 Q 936 56 936 64 V 472 Q 936 480 928 480 H 808 Q 800 480 800 488 V 520"/>
-<rect class="box planned" x="360" y="20" width="240" height="72" rx="8"/>
-<text class="name" x="480" y="48">VMs in shared VNet</text><text class="detail" x="480" y="72">Clients · not deployed</text>
+<rect class="box" x="360" y="20" width="240" height="72" rx="8"/>
+<text class="name" x="480" y="48">Three Windows VMs</text><text class="detail" x="480" y="72">Estates · Finance · Operations</text>
 <rect class="box" x="40" y="240" width="240" height="180" rx="8"/>
 <text class="name" x="160" y="272">Finance storage account</text>
 <text class="detail" x="160" y="296">department = Finance</text>
@@ -94,11 +103,12 @@ a { color: #2e5aa8; }
 <h2>Design decisions</h2>
 <p><strong>Shared subscription:</strong> keeps the network and department storage together. Separate storage accounts and department tags support cost tracking without extra subscriptions.</p>
 <p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The printer subnet has a security group with default rules. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
+<p><strong>Virtual machines:</strong> one Windows Server 2022 VM per department, each with a private address in the VM subnet. Each uses Standard_D2s_v4 and a Standard LRS system disk. No public VM addresses or remote access service are configured.</p>
 <p><strong>Managed storage:</strong> Azure Files removes the need for a dedicated file-server VM. Each share uses the Hot tier for frequent access, a 500 GiB quota and Standard storage with geo-redundant replication.</p>
 <p><strong>File access:</strong> a client resolves the storage account name, connects over SMB on TCP port 445 and authenticates with permission to the share. The current configuration enables public storage endpoints and defines no private endpoints. A resource group organises resources; it does not connect them.</p>
 <p><strong>Private access option:</strong> a private endpoint would provide a private IP in the VNet for reaching the file service. It would also require DNS to resolve the storage name to that IP. This option is not configured.</p>
 <h2>Current status</h2>
-<p>Terraform validation and a live plan passed on 29 October 2026: 13 resources to add, none to change or destroy. These changes have not been applied.</p>
+<p>Terraform validation and a live plan passed on 29 October 2026: 19 resources to add, none to change or destroy. These changes have not been applied.</p>
 <p>Microsoft Entra ID authentication, file-share permissions and a print service are not configured. The printer subnet alone does not provide printing.</p>
 <p>The private DNS zone remains in Terraform and is omitted from these diagrams because its removal is planned. The resource group outputs all reference the first resource group. See <a href="DESIGN.md">design decisions and limitations</a>.</p>
 </div>

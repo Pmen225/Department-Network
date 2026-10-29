@@ -18,6 +18,8 @@ svg { display: block; width: 100%; min-width: 960px; }
 .detail { font: 11px Geist, sans-serif; fill: #4f5d75; text-anchor: middle; }
 .note { font: 11px Geist, sans-serif; fill: #4f5d75; }
 .box { fill: #f5f5f5; stroke: #4f5d75; stroke-width: 1.5; }
+.zone { fill: #fafafa; stroke: #bfc0c0; stroke-width: 1.5; }
+.subnet { fill: white; stroke: #4f5d75; stroke-width: 1.5; }
 .planned { stroke-dasharray: 5 4; }
 .wire { fill: none; stroke: #4f5d75; stroke-width: 1.5; }
 .explanations { max-width: 860px; }
@@ -31,72 +33,84 @@ a { color: #2e5aa8; }
 <h1>Azure network design</h1>
 <p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources. Dashed boxes show the proposed printers. Dashed arrows show access paths that have not been configured or tested. These changes have not been applied.</p>
 <div class="diagram-container">
-<svg viewBox="0 0 960 660" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 960 616" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="network-title">Shared Azure network</title>
-<desc id="network-desc">Estates, Finance and Operations each have a Windows VM in the shared VM subnet, which has a security group and uses a NAT gateway and public IP for outbound connections; the printer subnet has no security group.</desc>
-<!-- Lines show resource associations, not tested traffic. -->
-<path class="wire" d="M 400 136 V 208 Q 400 216 392 216 H 188 Q 180 216 180 224 V 256"/>
-<path class="wire" d="M 480 136 V 256"/>
-<path class="wire" d="M 140 136 V 256"/>
-<path class="wire" d="M 280 292 H 304 Q 312 292 312 300 V 368 Q 312 376 320 376 H 692 Q 700 376 700 368 V 328"/>
-<path class="wire" d="M 780 328 V 432"/>
-<path class="wire" d="M 128 328 V 484"/>
-<path class="wire" d="M 180 328 V 448 Q 180 456 188 456 H 320 Q 328 456 328 464 V 484"/>
-<path class="wire" d="M 232 328 V 416 Q 232 424 240 424 H 520 Q 528 424 528 432 V 484"/>
-<rect class="box" x="360" y="64" width="200" height="72" rx="8"/>
-<text class="name" x="460" y="92">Virtual network</text><text class="detail" x="460" y="116">10.0.0.0/16</text>
-<rect class="box" x="40" y="64" width="200" height="72" rx="8"/>
-<text class="name" x="140" y="92">Security group</text><text class="detail" x="140" y="116">VM subnet rules</text>
-<rect class="box" x="80" y="256" width="200" height="72" rx="8"/>
-<text class="name" x="180" y="284">Subnet 1 · VMs</text><text class="detail" x="180" y="308">10.0.1.0/24</text>
-<rect class="box" x="360" y="256" width="200" height="72" rx="8"/>
-<text class="name" x="460" y="284">Subnet 2 · printers</text><text class="detail" x="460" y="308">10.0.2.0/28</text>
-<rect x="640" y="256" width="200" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
-<text class="name" x="740" y="284">NAT gateway</text><text class="detail" x="740" y="308">Outbound for VM subnet</text>
-<rect class="box" x="640" y="432" width="200" height="72" rx="8"/>
-<text class="name" x="740" y="460">Public IP address</text><text class="detail" x="740" y="484">Used by NAT gateway</text>
-<rect class="box" x="40" y="484" width="176" height="72" rx="8"/>
-<text class="name" x="128" y="512">Estates VM</text><text class="detail" x="128" y="536">Windows Server 2022</text>
-<rect class="box" x="240" y="484" width="176" height="72" rx="8"/>
-<text class="name" x="328" y="512">Finance VM</text><text class="detail" x="328" y="536">Windows Server 2022</text>
-<rect class="box" x="440" y="484" width="176" height="72" rx="8"/>
-<text class="name" x="528" y="512">Operations VM</text><text class="detail" x="528" y="536">Windows Server 2022</text>
-<text class="note" x="40" y="624">Three Windows VMs · Private addresses only · Printer devices and print service not configured</text>
+<desc id="network-desc">Three department Windows VMs sit inside the VM subnet of one virtual network; a security group is attached to that subnet and a NAT gateway with a public IP provides its outbound route, while the separate printer subnet has no security group.</desc>
+<!-- Containment shows network membership; lines show resource associations. -->
+<rect class="zone" x="32" y="120" width="576" height="424" rx="8"/>
+<path class="wire" d="M 464 96 V 208"/>
+<path class="wire" d="M 576 244 H 672"/>
+<path class="wire" d="M 792 280 V 344"/>
+<text class="name" x="64" y="156" style="text-anchor: start">Virtual network</text>
+<text class="detail" x="64" y="180" style="text-anchor: start">10.0.0.0/16</text>
+<rect class="box" x="352" y="24" width="224" height="72" rx="8"/>
+<text class="name" x="464" y="52">Security group · NSG</text>
+<text class="detail" x="464" y="76">Attached to VM subnet</text>
+<rect class="subnet" x="64" y="208" width="512" height="168" rx="8"/>
+<text class="name" x="88" y="240" style="text-anchor: start">Subnet 1 · VMs</text>
+<text class="detail" x="88" y="264" style="text-anchor: start">10.0.1.0/24</text>
+<rect class="box" x="80" y="288" width="144" height="64" rx="8"/>
+<text class="name" x="152" y="312">Estates VM</text>
+<text class="detail" x="152" y="336">Windows Server 2022</text>
+<rect class="box" x="248" y="288" width="144" height="64" rx="8"/>
+<text class="name" x="320" y="312">Finance VM</text>
+<text class="detail" x="320" y="336">Windows Server 2022</text>
+<rect class="box" x="416" y="288" width="144" height="64" rx="8"/>
+<text class="name" x="488" y="312">Operations VM</text>
+<text class="detail" x="488" y="336">Windows Server 2022</text>
+<rect class="subnet" x="64" y="424" width="512" height="80" rx="8"/>
+<text class="name" x="320" y="456">Subnet 2 · printers</text>
+<text class="detail" x="320" y="480">10.0.2.0/28 · No security group attached</text>
+<rect x="672" y="208" width="240" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
+<text class="name" x="792" y="236">NAT gateway</text>
+<text class="detail" x="792" y="260">Outbound for VM subnet</text>
+<rect class="box" x="672" y="344" width="240" height="72" rx="8"/>
+<text class="name" x="792" y="372">Public IP address</text>
+<text class="detail" x="792" y="396">Used by NAT gateway</text>
+<text class="note" x="32" y="584">Three Windows VMs · Private addresses only · Printer devices and print service not configured</text>
 </svg>
 </div>
 <h2>File and printer access</h2>
 <p>VM clients access each department's file share through its storage account address. They connect to printers separately. Dashed arrows show intended client access; storage accounts do not send print jobs.</p>
 <div class="diagram-container">
-<svg viewBox="0 0 960 680" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 960 468" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="department-title">VM access to department files and shared printers</title>
 <desc id="department-desc">Three Windows VMs are intended to access department file shares through public storage endpoints and connect separately to shared printers, subject to network access and permissions.</desc>
 <defs><marker id="department-arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4f5d75"/></marker></defs>
-<!-- Access starts at clients, never at a storage account. -->
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 420 92 V 152 Q 420 160 412 160 H 168 Q 160 160 160 168 V 240"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 480 92 V 240"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 540 92 V 152 Q 540 160 548 160 H 792 Q 800 160 800 168 V 240"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 600 56 H 928 Q 936 56 936 64 V 472 Q 936 480 928 480 H 808 Q 800 480 800 488 V 520"/>
-<rect class="box" x="360" y="20" width="240" height="72" rx="8"/>
-<text class="name" x="480" y="48">Three Windows VMs</text><text class="detail" x="480" y="72">Estates · Finance · Operations</text>
-<rect class="box" x="40" y="240" width="240" height="180" rx="8"/>
-<text class="name" x="160" y="272">Finance storage account</text>
-<text class="detail" x="160" y="296">department = Finance</text>
-<rect class="box" x="64" y="324" width="192" height="64" rx="8"/>
-<text class="name" x="160" y="352">finance</text><text class="detail" x="160" y="372">Hot · 500 GiB</text>
-<rect class="box" x="360" y="240" width="240" height="180" rx="8"/>
-<text class="name" x="480" y="272">Estates storage account</text>
-<text class="detail" x="480" y="296">department = Estates</text>
-<rect class="box" x="384" y="324" width="192" height="64" rx="8"/>
-<text class="name" x="480" y="352">estates-fileshare</text><text class="detail" x="480" y="372">Hot · 500 GiB</text>
-<rect class="box" x="680" y="240" width="240" height="180" rx="8"/>
-<text class="name" x="800" y="272">Operations storage account</text>
-<text class="detail" x="800" y="296">department = Operations</text>
-<rect class="box" x="704" y="324" width="192" height="64" rx="8"/>
-<text class="name" x="800" y="352">operations</text><text class="detail" x="800" y="372">Hot · 500 GiB</text>
-<rect class="box planned" x="680" y="520" width="240" height="72" rx="8"/>
-<text class="name" x="800" y="548">Shared printers</text>
-<text class="detail" x="800" y="572">Print service not configured</text>
-<text class="note" x="40" y="628">One shared subscription · No private endpoints · Authentication and permissions still required</text>
+<!-- Each intended access path runs directly from clients to its destination. -->
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 136 104 V 200"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 368 104 V 200"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 600 104 V 200"/>
+<path class="wire planned" marker-end="url(#department-arrow)" d="M 828 104 V 200"/>
+<rect class="box" x="32" y="32" width="896" height="72" rx="8"/>
+<text class="name" x="480" y="60">Three Windows VMs</text>
+<text class="detail" x="480" y="84">Estates · Finance · Operations</text>
+<rect class="box" x="32" y="200" width="208" height="184" rx="8"/>
+<text class="name" x="136" y="228">Estates</text>
+<text class="name" x="136" y="248">Storage account</text>
+<text class="detail" x="136" y="272">department = Estates</text>
+<rect class="subnet" x="48" y="296" width="176" height="64" rx="8"/>
+<text class="name" x="136" y="320">estates-fileshare</text>
+<text class="detail" x="136" y="344">Hot · 500 GiB</text>
+<rect class="box" x="264" y="200" width="208" height="184" rx="8"/>
+<text class="name" x="368" y="228">Finance</text>
+<text class="name" x="368" y="248">Storage account</text>
+<text class="detail" x="368" y="272">department = Finance</text>
+<rect class="subnet" x="280" y="296" width="176" height="64" rx="8"/>
+<text class="name" x="368" y="320">finance</text>
+<text class="detail" x="368" y="344">Hot · 500 GiB</text>
+<rect class="box" x="496" y="200" width="208" height="184" rx="8"/>
+<text class="name" x="600" y="228">Operations</text>
+<text class="name" x="600" y="248">Storage account</text>
+<text class="detail" x="600" y="272">department = Operations</text>
+<rect class="subnet" x="512" y="296" width="176" height="64" rx="8"/>
+<text class="name" x="600" y="320">operations</text>
+<text class="detail" x="600" y="344">Hot · 500 GiB</text>
+<rect class="box planned" x="728" y="200" width="200" height="104" rx="8"/>
+<text class="name" x="828" y="236">Shared printers</text>
+<text class="detail" x="828" y="264">Print service</text>
+<text class="detail" x="828" y="280">not configured</text>
+<text class="note" x="32" y="436">One shared subscription · No private endpoints · Authentication and permissions still required</text>
 </svg>
 </div>
 <div class="explanations">

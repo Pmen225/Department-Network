@@ -34,8 +34,14 @@ resource "azurerm_subnet" "subnet_2" {
   default_outbound_access_enabled = false
 }
 
-resource "azurerm_subnet_network_security_group_association" "subnet_2" {
-  subnet_id                 = azurerm_subnet.subnet_2.id
+# - Keep Terraform's record when renaming the subnet association.
+moved {
+  from = azurerm_subnet_network_security_group_association.subnet_2
+  to   = azurerm_subnet_network_security_group_association.subnet_1
+}
+
+resource "azurerm_subnet_network_security_group_association" "subnet_1" {
+  subnet_id                 = azurerm_subnet.subnet_1.id
   network_security_group_id = azurerm_network_security_group.NSG.id
 }
 

@@ -33,20 +33,20 @@ a { color: #2e5aa8; }
 <div class="diagram-container">
 <svg viewBox="0 0 960 660" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="network-title">Shared Azure network</title>
-<desc id="network-desc">Estates, Finance and Operations each have a Windows VM in the shared VM subnet, which uses a NAT gateway and public IP for outbound connections; the printer subnet has a security group.</desc>
+<desc id="network-desc">Estates, Finance and Operations each have a Windows VM in the shared VM subnet, which has a security group and uses a NAT gateway and public IP for outbound connections; the printer subnet has no security group.</desc>
 <!-- Lines show resource associations, not tested traffic. -->
-<path class="wire" d="M 264 136 V 184 Q 264 192 256 192 H 188 Q 180 192 180 200 V 256"/>
-<path class="wire" d="M 336 136 V 184 Q 336 192 344 192 H 452 Q 460 192 460 200 V 256"/>
-<path class="wire" d="M 700 136 V 192 Q 700 200 692 200 H 528 Q 520 200 520 208 V 256"/>
+<path class="wire" d="M 400 136 V 208 Q 400 216 392 216 H 188 Q 180 216 180 224 V 256"/>
+<path class="wire" d="M 480 136 V 256"/>
+<path class="wire" d="M 140 136 V 256"/>
 <path class="wire" d="M 280 292 H 304 Q 312 292 312 300 V 368 Q 312 376 320 376 H 692 Q 700 376 700 368 V 328"/>
 <path class="wire" d="M 780 328 V 432"/>
 <path class="wire" d="M 128 328 V 484"/>
 <path class="wire" d="M 180 328 V 448 Q 180 456 188 456 H 320 Q 328 456 328 464 V 484"/>
 <path class="wire" d="M 232 328 V 416 Q 232 424 240 424 H 520 Q 528 424 528 432 V 484"/>
-<rect class="box" x="200" y="64" width="200" height="72" rx="8"/>
-<text class="name" x="300" y="92">Virtual network</text><text class="detail" x="300" y="116">10.0.0.0/16</text>
-<rect class="box" x="600" y="64" width="200" height="72" rx="8"/>
-<text class="name" x="700" y="92">Security group</text><text class="detail" x="700" y="116">Printer subnet rules</text>
+<rect class="box" x="360" y="64" width="200" height="72" rx="8"/>
+<text class="name" x="460" y="92">Virtual network</text><text class="detail" x="460" y="116">10.0.0.0/16</text>
+<rect class="box" x="40" y="64" width="200" height="72" rx="8"/>
+<text class="name" x="140" y="92">Security group</text><text class="detail" x="140" y="116">VM subnet rules</text>
 <rect class="box" x="80" y="256" width="200" height="72" rx="8"/>
 <text class="name" x="180" y="284">Subnet 1 · VMs</text><text class="detail" x="180" y="308">10.0.1.0/24</text>
 <rect class="box" x="360" y="256" width="200" height="72" rx="8"/>
@@ -102,13 +102,14 @@ a { color: #2e5aa8; }
 <div class="explanations">
 <h2>Design decisions</h2>
 <p><strong>Shared subscription:</strong> keeps the network and department storage together. Separate storage accounts and department tags support cost tracking without extra subscriptions.</p>
-<p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The printer subnet has a security group with default rules. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
+<p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The VM subnet has a security group with default rules, which still allow traffic within the VNet. No custom access restrictions are configured. The printer subnet has no security group. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
 <p><strong>Virtual machines:</strong> one Windows Server 2022 VM per department, each with a private address in the VM subnet. Each uses Standard_D2s_v4 and a Standard LRS system disk. No public VM addresses or remote access service are configured.</p>
+<p><strong>Password protection:</strong> the administrator password is supplied through a variable marked <code>sensitive = true</code> in both the root and Networking module. Terraform hides it in normal output. The setting does not encrypt the password or remove it from state and saved plans. Those files and local variable files are excluded from GitHub. See <a href="DESIGN.md#virtual-machines">password security details</a>.</p>
 <p><strong>Managed storage:</strong> Azure Files removes the need for a dedicated file-server VM. Each share uses the Hot tier for frequent access, a 500 GiB quota and Standard storage with geo-redundant replication.</p>
 <p><strong>File access:</strong> a client resolves the storage account name, connects over SMB on TCP port 445 and authenticates with permission to the share. The current configuration enables public storage endpoints and defines no private endpoints. A resource group organises resources; it does not connect them.</p>
 <p><strong>Private access option:</strong> a private endpoint would provide a private IP in the VNet for reaching the file service. It would also require DNS to resolve the storage name to that IP. This option is not configured.</p>
 <h2>Current status</h2>
-<p>Terraform validation and a live plan passed on 29 October 2026: 19 resources to add, none to change or destroy. These changes have not been applied.</p>
+<p>Terraform validation and a live plan passed on 29 October 2026: 20 resources to add, none to change and one to destroy. The removal is the old printer-subnet NSG attachment. These changes have not been applied.</p>
 <p>Microsoft Entra ID authentication, file-share permissions and a print service are not configured. The printer subnet alone does not provide printing.</p>
 <p>The private DNS zone remains in Terraform and is omitted from these diagrams because its removal is planned. The resource group outputs all reference the first resource group. See <a href="DESIGN.md">design decisions and limitations</a>.</p>
 </div>

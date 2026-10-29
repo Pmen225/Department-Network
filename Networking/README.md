@@ -1,12 +1,39 @@
 # Networking
 
-- VNet: `10.0.0.0/16`.
-- VM subnet: `10.0.1.0/24`. NSG and NAT gateway attached.
-- Three Windows Server 2022 VMs: `estates-vm`, `finance-vm` and `operations-vm`. Each has a network interface in the VM subnet, a dynamic private IP, size `Standard_D2s_v4` and a Standard LRS system disk.
-- Local administrator: `vmadmin`. The `vm_admin_password` input is required. `sensitive = true` hides it in normal Terraform output; state and saved plans still contain it. No VM public IPs, remote access service, file mounts or printer software are configured.
-- Printer subnet: `10.0.2.0/28`. No NSG attached. No NAT gateway. Automatic outbound access disabled.
-- NAT gateway: Standard. Zone 1. Idle timeout: 10 minutes.
-- Public IP: Standard. Static. Zone 1. Attached to the NAT gateway.
-- Estates, Finance and Operations each have a storage account and 500 GiB Hot file share in one shared subscription. Accounts use Standard and GRS.
-- Estates share: `estates-fileshare`.
-- Storage accounts have `department` tags: `Estates`, `Finance` and `Operations`, for grouping storage costs.
+Defines the shared network, three Windows VMs and department storage.
+
+## Network
+
+- **VNet:** `10.0.0.0/16`.
+- **VM subnet:** `10.0.1.0/24`. NSG + NAT gateway attached.
+- **Printer subnet:** `10.0.2.0/28`. No NSG or NAT; automatic outbound access disabled.
+- **NAT gateway:** Standard · Zone 1 · 10-minute idle timeout.
+- **Public IP:** Standard · Static · Zone 1 · Attached to NAT.
+
+<details>
+<summary><strong>Virtual machines</strong></summary>
+
+- **Names:** `estates-vm`, `finance-vm`, `operations-vm`.
+- **System:** Windows Server 2022.
+- **Size:** `Standard_D2s_v4`.
+- **System disk:** Standard LRS.
+- **Network:** Own interface + dynamic private IP in the VM subnet.
+- **Administrator:** `vmadmin`.
+- **Password input:** `vm_admin_password`. Required; marked sensitive.
+- **Password protection:** Hidden in normal output. Still present in state and saved plans.
+- **Not configured:** VM public IPs, remote access, file mounts or printer software.
+
+</details>
+
+<details>
+<summary><strong>File storage</strong></summary>
+
+- **Departments:** Estates, Finance and Operations.
+- **Subscription:** Shared.
+- **Accounts:** One per department. Standard GRS.
+- **Shares:** `estates-fileshare`, `finance`, `operations`.
+- **Quota:** 500 GiB each.
+- **Tier:** Hot.
+- **Cost tracking:** Used `department` tags.
+
+</details>

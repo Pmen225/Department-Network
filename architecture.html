@@ -24,108 +24,138 @@ svg { display: block; width: 100%; min-width: 960px; }
 .wire { fill: none; stroke: #4f5d75; stroke-width: 1.5; }
 .explanations { max-width: 860px; }
 .explanations p { margin: 8px 0; }
+details { border-bottom: 1px solid #bfc0c0; padding: 12px 0; }
+summary { cursor: pointer; }
+li { line-height: 1.5; margin: 8px 0; }
 a { color: #2e5aa8; }
 @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
 </style>
 </head>
 <body>
 <main>
-<h1>Azure network design</h1>
-<p>Shared networking and managed file storage for Estates, Finance and Operations in Azure UK South. Solid boxes show Terraform resources. Dashed boxes show the proposed printers. Dashed arrows show access paths that have not been configured or tested. These changes have not been applied.</p>
+<h1>Department Network</h1>
+<p>Azure UK South · Estates · Finance · Operations</p>
+<p><strong>Status:</strong> latest changes planned, not applied. Solid lines show resource attachments. Dashed arrows show intended access, not tested connections.</p>
 <div class="diagram-container">
-<svg viewBox="0 0 960 616" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="network-title">Shared Azure network</title>
-<desc id="network-desc">Three department Windows VMs sit inside the VM subnet of one virtual network; a security group is attached to that subnet and a NAT gateway with a public IP provides its outbound route, while the separate printer subnet has no security group.</desc>
-<!-- Containment shows network membership; lines show resource associations. -->
-<rect class="zone" x="32" y="120" width="576" height="424" rx="8"/>
-<path class="wire" d="M 464 96 V 208"/>
-<path class="wire" d="M 576 244 H 672"/>
-<path class="wire" d="M 792 280 V 344"/>
-<text class="name" x="64" y="156" style="text-anchor: start">Virtual network</text>
-<text class="detail" x="64" y="180" style="text-anchor: start">10.0.0.0/16</text>
-<rect class="box" x="352" y="24" width="224" height="72" rx="8"/>
-<text class="name" x="464" y="52">Security group · NSG</text>
-<text class="detail" x="464" y="76">Attached to VM subnet</text>
-<rect class="subnet" x="64" y="208" width="512" height="168" rx="8"/>
-<text class="name" x="88" y="240" style="text-anchor: start">Subnet 1 · VMs</text>
-<text class="detail" x="88" y="264" style="text-anchor: start">10.0.1.0/24</text>
-<rect class="box" x="80" y="288" width="144" height="64" rx="8"/>
-<text class="name" x="152" y="312">Estates VM</text>
-<text class="detail" x="152" y="336">Windows Server 2022</text>
-<rect class="box" x="248" y="288" width="144" height="64" rx="8"/>
-<text class="name" x="320" y="312">Finance VM</text>
-<text class="detail" x="320" y="336">Windows Server 2022</text>
-<rect class="box" x="416" y="288" width="144" height="64" rx="8"/>
-<text class="name" x="488" y="312">Operations VM</text>
-<text class="detail" x="488" y="336">Windows Server 2022</text>
-<rect class="subnet" x="64" y="424" width="512" height="80" rx="8"/>
-<text class="name" x="320" y="456">Subnet 2 · printers</text>
-<text class="detail" x="320" y="480">10.0.2.0/28 · No security group attached</text>
-<rect x="672" y="208" width="240" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
-<text class="name" x="792" y="236">NAT gateway</text>
-<text class="detail" x="792" y="260">Outbound for VM subnet</text>
-<rect class="box" x="672" y="344" width="240" height="72" rx="8"/>
-<text class="name" x="792" y="372">Public IP address</text>
-<text class="detail" x="792" y="396">Used by NAT gateway</text>
-<text class="note" x="32" y="584">Three Windows VMs · Private addresses only · Printer devices and print service not configured</text>
-</svg>
-</div>
-<h2>File and printer access</h2>
-<p>VM clients access each department's file share through its storage account address. They connect to printers separately. Dashed arrows show intended client access; storage accounts do not send print jobs.</p>
-<div class="diagram-container">
-<svg viewBox="0 0 960 468" role="img" aria-labelledby="department-title department-desc" xmlns="http://www.w3.org/2000/svg">
-<title id="department-title">VM access to department files and shared printers</title>
-<desc id="department-desc">Three Windows VMs are intended to access department file shares through public storage endpoints and connect separately to shared printers, subject to network access and permissions.</desc>
-<defs><marker id="department-arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4f5d75"/></marker></defs>
-<!-- Each intended access path runs directly from clients to its destination. -->
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 136 104 V 200"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 368 104 V 200"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 600 104 V 200"/>
-<path class="wire planned" marker-end="url(#department-arrow)" d="M 828 104 V 200"/>
-<rect class="box" x="32" y="32" width="896" height="72" rx="8"/>
-<text class="name" x="480" y="60">Three Windows VMs</text>
-<text class="detail" x="480" y="84">Estates · Finance · Operations</text>
-<rect class="box" x="32" y="200" width="208" height="184" rx="8"/>
-<text class="name" x="136" y="228">Estates</text>
-<text class="name" x="136" y="248">Storage account</text>
-<text class="detail" x="136" y="272">department = Estates</text>
-<rect class="subnet" x="48" y="296" width="176" height="64" rx="8"/>
-<text class="name" x="136" y="320">estates-fileshare</text>
-<text class="detail" x="136" y="344">Hot · 500 GiB</text>
-<rect class="box" x="264" y="200" width="208" height="184" rx="8"/>
-<text class="name" x="368" y="228">Finance</text>
-<text class="name" x="368" y="248">Storage account</text>
-<text class="detail" x="368" y="272">department = Finance</text>
-<rect class="subnet" x="280" y="296" width="176" height="64" rx="8"/>
-<text class="name" x="368" y="320">finance</text>
-<text class="detail" x="368" y="344">Hot · 500 GiB</text>
-<rect class="box" x="496" y="200" width="208" height="184" rx="8"/>
-<text class="name" x="600" y="228">Operations</text>
-<text class="name" x="600" y="248">Storage account</text>
-<text class="detail" x="600" y="272">department = Operations</text>
-<rect class="subnet" x="512" y="296" width="176" height="64" rx="8"/>
-<text class="name" x="600" y="320">operations</text>
-<text class="detail" x="600" y="344">Hot · 500 GiB</text>
-<rect class="box planned" x="728" y="200" width="200" height="104" rx="8"/>
-<text class="name" x="828" y="236">Shared printers</text>
-<text class="detail" x="828" y="264">Print service</text>
-<text class="detail" x="828" y="280">not configured</text>
-<text class="note" x="32" y="436">One shared subscription · No private endpoints · Authentication and permissions still required</text>
+<svg viewBox="0 0 1120 848" role="img" aria-labelledby="network-title network-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="network-title">Department network, file shares and printers</title>
+<desc id="network-desc">One virtual network contains three department VMs and a printer subnet; the VM subnet has an NSG and NAT gateway with a static public IP, while intended access leads to department file shares outside the VNet and proposed shared printers.</desc>
+<defs><marker id="network-arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="#4f5d75"/></marker></defs>
+<!-- Containment shows membership. Dashed paths show intended client access. -->
+<rect class="zone" x="40" y="168" width="1040" height="352" rx="8"/>
+<rect class="subnet" x="72" y="256" width="688" height="216" rx="8"/>
+<rect class="subnet" x="808" y="256" width="240" height="216" rx="8"/>
+<path class="wire" d="M 232 76 H 272"/>
+<path class="wire" d="M 368 112 V 256"/>
+<path class="wire" d="M 664 112 V 256"/>
+<path class="wire planned" marker-end="url(#network-arrow)" d="M 192 432 V 648"/>
+<path class="wire planned" marker-end="url(#network-arrow)" d="M 408 432 V 648"/>
+<path class="wire planned" marker-end="url(#network-arrow)" d="M 624 432 V 648"/>
+<path class="wire planned" marker-end="url(#network-arrow)" d="M 760 396 H 832"/>
+<rect class="box" x="40" y="40" width="192" height="72" rx="8"/>
+<text class="name" x="136" y="68">Public IP address</text>
+<text class="detail" x="136" y="92">Static · Used by NAT</text>
+<rect x="272" y="40" width="192" height="72" rx="8" fill="#faeee9" stroke="#bf4520" stroke-width="1.5"/>
+<text class="name" x="368" y="68">NAT gateway</text>
+<text class="detail" x="368" y="92">VM subnet outbound</text>
+<rect class="box" x="568" y="40" width="192" height="72" rx="8"/>
+<text class="name" x="664" y="68">Security group · NSG</text>
+<text class="detail" x="664" y="92">Attached to VM subnet</text>
+<text class="name" x="72" y="204" style="text-anchor: start">Virtual network</text>
+<text class="detail" x="72" y="228" style="text-anchor: start">10.0.0.0/16</text>
+<text class="name" x="96" y="288" style="text-anchor: start">Subnet 1 · VMs</text>
+<text class="detail" x="96" y="312" style="text-anchor: start">10.0.1.0/24 · Private VM addresses</text>
+<rect class="box" x="96" y="360" width="192" height="72" rx="8"/>
+<text class="name" x="192" y="388">Estates VM</text>
+<text class="detail" x="192" y="412">Windows Server 2022</text>
+<rect class="box" x="312" y="360" width="192" height="72" rx="8"/>
+<text class="name" x="408" y="388">Finance VM</text>
+<text class="detail" x="408" y="412">Windows Server 2022</text>
+<rect class="box" x="528" y="360" width="192" height="72" rx="8"/>
+<text class="name" x="624" y="388">Operations VM</text>
+<text class="detail" x="624" y="412">Windows Server 2022</text>
+<text class="name" x="928" y="288">Subnet 2 · printers</text>
+<text class="detail" x="928" y="312">10.0.2.0/28 · No NSG</text>
+<rect class="box planned" x="832" y="360" width="192" height="72" rx="8"/>
+<text class="name" x="928" y="388">Shared printers</text>
+<text class="detail" x="928" y="412">Print service not configured</text>
+<rect class="box" x="96" y="648" width="192" height="128" rx="8"/>
+<text class="name" x="192" y="676">Estates storage</text>
+<text class="detail" x="192" y="700">department = Estates</text>
+<text class="name" x="192" y="732">estates-fileshare</text>
+<text class="detail" x="192" y="756">Hot · 500 GiB</text>
+<rect class="box" x="312" y="648" width="192" height="128" rx="8"/>
+<text class="name" x="408" y="676">Finance storage</text>
+<text class="detail" x="408" y="700">department = Finance</text>
+<text class="name" x="408" y="732">finance</text>
+<text class="detail" x="408" y="756">Hot · 500 GiB</text>
+<rect class="box" x="528" y="648" width="192" height="128" rx="8"/>
+<text class="name" x="624" y="676">Operations storage</text>
+<text class="detail" x="624" y="700">department = Operations</text>
+<text class="name" x="624" y="732">operations</text>
+<text class="detail" x="624" y="756">Hot · 500 GiB</text>
+<text class="name" x="808" y="676" style="text-anchor: start">Azure Files</text>
+<text class="note" x="808" y="700">Storage accounts outside the VNet</text>
+<text class="note" x="808" y="724">Public storage addresses</text>
+<text class="note" x="808" y="748">Permissions not configured</text>
+<text class="note" x="40" y="824">One shared subscription · No private endpoints · File access and printing not tested</text>
 </svg>
 </div>
 <div class="explanations">
-<h2>Design decisions</h2>
-<p><strong>Shared subscription:</strong> keeps the network and department storage together. Separate storage accounts and department tags support cost tracking without extra subscriptions.</p>
-<p><strong>Network:</strong> separate subnets reserve addresses for VMs and printers. The VM subnet has a security group with default rules, which still allow traffic within the VNet. No custom access restrictions are configured. The printer subnet has no security group. The VM subnet uses a NAT gateway and static public IP for outbound connections.</p>
-<p><strong>Virtual machines:</strong> one Windows Server 2022 VM per department, each with a private address in the VM subnet. Each uses Standard_D2s_v4 and a Standard LRS system disk. No public VM addresses or remote access service are configured.</p>
-<p><strong>Password protection:</strong> the administrator password is supplied through a variable marked <code>sensitive = true</code> in both the root and Networking module. Terraform hides it in normal output. The setting does not encrypt the password or remove it from state and saved plans. Those files and local variable files are excluded from GitHub. See <a href="DESIGN.md#virtual-machines">password security details</a>.</p>
-<p><strong>Managed storage:</strong> Azure Files removes the need for a dedicated file-server VM. Each share uses the Hot tier for frequent access, a 500 GiB quota and Standard storage with geo-redundant replication.</p>
-<p><strong>File access:</strong> a client resolves the storage account name, connects over SMB on TCP port 445 and authenticates with permission to the share. The current configuration enables public storage endpoints and defines no private endpoints. A resource group organises resources; it does not connect them.</p>
-<p><strong>Private access option:</strong> a private endpoint would provide a private IP in the VNet for reaching the file service. It would also require DNS to resolve the storage name to that IP. This option is not configured.</p>
-<h2>Current status</h2>
-<p>Terraform validation and a live plan passed on 29 October 2026: 20 resources to add, none to change and one to destroy. The removal is the old printer-subnet NSG attachment. These changes have not been applied.</p>
-<p>Microsoft Entra ID authentication, file-share permissions and a print service are not configured. The printer subnet alone does not provide printing.</p>
-<p>The private DNS zone remains in Terraform and is omitted from these diagrams because its removal is planned. The resource group outputs all reference the first resource group. See <a href="DESIGN.md">design decisions and limitations</a>.</p>
+<h2>Design notes</h2>
+<details>
+<summary><strong>Network</strong></summary>
+<ul>
+<li><strong>One subscription:</strong> shared by all three departments.</li>
+<li><strong>Separate subnets:</strong> reserve addresses for VMs and printers.</li>
+<li><strong>NSG:</strong> attached to the VM subnet. Default rules only; internal traffic allowed.</li>
+<li><strong>NAT + static public IP:</strong> outbound path for the VM subnet.</li>
+<li><strong>Printer subnet:</strong> no NSG or NAT; automatic outbound access disabled.</li>
+</ul>
+</details>
+<details>
+<summary><strong>Virtual machines</strong></summary>
+<ul>
+<li><strong>One per department:</strong> Estates, Finance and Operations.</li>
+<li><strong>System:</strong> Windows Server 2022.</li>
+<li><strong>Size:</strong> Standard_D2s_v4. Standard LRS system disk.</li>
+<li><strong>Addresses:</strong> dynamic private IPs. No VM public IPs.</li>
+<li><strong>Remote access:</strong> no VPN or Bastion configured.</li>
+</ul>
+</details>
+<details>
+<summary><strong>Password protection</strong></summary>
+<ul>
+<li><strong>Input:</strong> vm_admin_password. Required in the root and Networking module.</li>
+<li><strong>sensitive = true:</strong> hides the password in normal Terraform output.</li>
+<li><strong>State + saved plans:</strong> still contain the password. Keep them private.</li>
+<li><strong>GitHub:</strong> state, saved plans and local variable files excluded.</li>
+</ul>
+</details>
+<details>
+<summary><strong>File storage</strong></summary>
+<ul>
+<li><strong>Azure Files:</strong> managed shares; no dedicated file-server VM.</li>
+<li><strong>Accounts:</strong> one per department. Standard GRS.</li>
+<li><strong>Hot tier:</strong> frequent access. <strong>Quota:</strong> 500 GiB per share.</li>
+<li><strong>Cost tracking:</strong> used department tags.</li>
+<li><strong>Access:</strong> public storage addresses. No private endpoints.</li>
+<li><strong>Permissions:</strong> Entra ID authentication and share permissions not configured.</li>
+</ul>
+</details>
+<details>
+<summary><strong>Checks and gaps</strong></summary>
+<ul>
+<li><strong>29 October 2026:</strong> Terraform validation and live plan passed.</li>
+<li><strong>Plan:</strong> 20 add · 0 change · 1 destroy.</li>
+<li><strong>Removal:</strong> old printer-subnet NSG attachment.</li>
+<li><strong>Not applied:</strong> file access, printing and connectivity untested.</li>
+<li><strong>Not configured:</strong> print service, file mounts and remote access.</li>
+<li><strong>DNS:</strong> zone still in Terraform. Removal planned; omitted from the diagram.</li>
+<li><strong>Known issue:</strong> resource group outputs all return the first group.</li>
+</ul>
+</details>
+<p><a href="README.md">Project overview</a> · <a href="DESIGN.md">Decisions and limitations</a></p>
 </div>
 </main>
 </body>

@@ -1,26 +1,92 @@
-# Azure department network
+# Department Network
 
-Terraform configuration for shared networking, three Windows VMs and department file storage in Azure UK South.
+Shared Azure networking, three Windows VMs and department file shares.
 
-- One VNet (`10.0.0.0/16`) with a VM subnet (`10.0.1.0/24`) and printer subnet (`10.0.2.0/28`).
-- The VM subnet has an NSG and uses a NAT gateway and static public IP for outbound connections. The printer subnet has no NSG or NAT gateway, and automatic outbound access is disabled.
-- Estates, Finance and Operations each have a Standard GRS storage account and a 500 GiB Hot file share. Department tags identify storage costs within one subscription.
-- Estates, Finance and Operations each have a Windows Server 2022 VM in the shared VM subnet. Each uses `Standard_D2s_v4`, a Standard LRS system disk and a dynamic private IP. No VM public IPs are configured.
-- Five resource groups. No printer devices or print service are defined.
+**Region:** UK South · **Departments:** Estates, Finance, Operations
+
+> **Status:** Latest changes planned, not applied.
 
 [Architecture diagram](architecture.html) · [Design decisions](DESIGN.md)
 
-## Validation
+<details open>
+<summary><strong>Network</strong></summary>
 
-- `terraform validate` and a live `terraform plan` passed on 29 October 2026: **20 to add, 0 to change, 1 to destroy**. The removal is the old printer-subnet NSG attachment. These changes have not been applied.
-- The plan used Finance account name `tfchfinance20261029` and Operations account name `tfchoperations20261029`. The Estates account is `tfchestates20261029`. All three names were available when checked; a plan does not reserve them.
-- Finance and Operations account names and a sensitive `vm_admin_password` are required inputs. All three VMs use the local administrator `vmadmin`. The plan used a temporary password; deployment requires a supplied password. `sensitive = true` hides the password in normal Terraform output; it does not encrypt it or remove it from state and saved plans. These files must remain private and are excluded from GitHub.
-- The provider uses the Azure CLI subscription unless `ARM_SUBSCRIPTION_ID` is set.
+- **Subscription:** One shared subscription.
+- **VNet:** `10.0.0.0/16`.
+- **VM subnet:** `10.0.1.0/24`. NSG + NAT gateway attached.
+- **Internet access:** NAT gateway + static public IP.
+- **Printer subnet:** `10.0.2.0/28`. No NSG or NAT. Automatic outbound access disabled.
+- **Resource groups:** Five defined. See the output issue below.
 
-## Limitations
+</details>
 
-- Remote access to VMs, file-share mounting and printing are not configured. No VPN or Bastion connection is defined for reaching the private VM addresses.
-- Storage uses public endpoints; no private endpoints are configured. Microsoft Entra ID authentication and file-share permissions are not configured. File access and network connectivity have not been tested.
-- Printer access requires a print service and permissions. The subnet only reserves network addresses.
-- The private DNS zone remains in Terraform; its removal is planned. It is omitted from the diagrams.
-- Resource group outputs `rg1`, `rg2` and `rg3` all return `rg1`. Networking, the three VMs and Estates storage therefore use `networking_Rg`.
+<details>
+<summary><strong>Virtual machines</strong></summary>
+
+- **VMs:** Estates, Finance and Operations.
+- **System:** Windows Server 2022.
+- **Size:** `Standard_D2s_v4`.
+- **System disk:** Standard LRS.
+- **Addresses:** Dynamic private IPs. No VM public IPs.
+- **Administrator:** `vmadmin`.
+
+</details>
+
+<details>
+<summary><strong>File storage</strong></summary>
+
+- **Accounts:** One per department. Standard GRS.
+- **Cost tracking:** Used `department` tags.
+
+| Department | File share | Quota | Tier |
+| --- | --- | --- | --- |
+| Estates | `estates-fileshare` | 500 GiB | Hot |
+| Finance | `finance` | 500 GiB | Hot |
+| Operations | `operations` | 500 GiB | Hot |
+
+</details>
+
+<details>
+<summary><strong>Password protection</strong></summary>
+
+- **Input:** `vm_admin_password`. Required; marked `sensitive = true`.
+- **Normal output:** Password hidden.
+- **State + saved plans:** Still contain the password. Keep them private.
+- **GitHub:** State, saved plans and local variable files excluded.
+
+</details>
+
+<details>
+<summary><strong>Checks</strong></summary>
+
+- **Date:** 29 October 2026.
+- **Validation:** Passed.
+- **Live plan:** **20 add · 0 change · 1 destroy**.
+- **Removal:** Old printer-subnet NSG attachment.
+- **Deployment:** These changes have not been applied.
+
+</details>
+
+<details>
+<summary><strong>Not configured / known issues</strong></summary>
+
+- **VM access:** No VPN or Bastion.
+- **Files:** No mounts, Entra ID authentication or share permissions.
+- **Storage:** Public endpoints. No private endpoints or network restrictions.
+- **Printing:** No printer devices or print service. The subnet only reserves addresses.
+- **Connectivity:** File access, printing and network connections untested.
+- **DNS zone:** Still in Terraform. Removal planned; omitted from the diagram.
+- **Outputs:** `rg1`, `rg2` and `rg3` all return `rg1`.
+- **Effect:** Network, VMs and Estates storage use `networking_Rg`.
+
+</details>
+
+<details>
+<summary><strong>Deployment inputs</strong></summary>
+
+- **Required:** Finance and Operations account names; `vm_admin_password`.
+- **Subscription:** Azure CLI selection, unless `ARM_SUBSCRIPTION_ID` is set.
+- **Plan password:** Temporary. Supply a password before deployment.
+- **Account names checked:** Recorded in [design decisions](DESIGN.md#checks).
+
+</details>
